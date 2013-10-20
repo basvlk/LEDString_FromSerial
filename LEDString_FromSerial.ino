@@ -13,15 +13,13 @@
    NEXT STEPS: use Serial.Find instead of evaluation serial.read for '255' every cycle
    2nd byte is a MODE byte which triggers cases
    load 5 different arrays with loading-modes, and trigger them quickly witch trigger modes
-   
-   
    */
   
   //LED stuff
   #include "LPD8806.h"
   #include "SPI.h"
   
-  int nLEDs = 20; // Number of RGB LEDs in strand:
+  const  int nLEDs = 24; // Number of RGB LEDs in strand:
   int dataPin  = 2; //green wire
   int clockPin = 3; //yellow wire
   
@@ -29,16 +27,19 @@
   
   // Basic stuff
   const int ArduinoLedPin =  13;      // the number of the LED pin
-  const int ArraySize = 60;
   boolean Diagnostic = 1;
   
   // Serial comms stuff
   byte inByte = 0; //inByte is constantly read and evaluated for value '255' If its not 255, it is discarded and the next byte is read
   int BytesInBuffer = 0;
+  int ArrayRow = 4;
   
-  byte STATE[ArraySize];
-  byte RED[ArraySize] = {
+  byte STATE[10][nLEDs*3];
+  byte RED[nLEDs*3] = {
     255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, };
+  byte BLUE[nLEDs*3] = {
+    0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,0, 0, 127,};
+  
   
   
   void setup() {
@@ -82,24 +83,31 @@
   {
     ///LED TEST
     int i;
+    /*
+      for (i=0; i < nLEDs; i++) {
+     strip.setPixelColor(i, strip.Color((BLUE[i*3])/2,(BLUE[i*3+1])/2,(BLUE[i*3+2])/2));
+     // strip.setPixelColor(i, strip.Color(0,0,127));
+     strip.show();
+     }
+     delay(300);
+     
+     for (i=0; i < nLEDs; i++) {
+     strip.setPixelColor(i, strip.Color((RED[i*3])/2,(RED[i*3+1])/2,(RED[i*3+2])/2));
+     strip.show();
+     }
+     delay(300);
+     */
   
-    for (i=0; i < ArraySize/3; i++) {
-      strip.setPixelColor(i,strip.Color(10,0,0));
+  
+    for (i=0; i < nLEDs; i++) {
+      strip.setPixelColor(i, strip.Color((STATE[ArrayRow][i*3])/2,(STATE[ArrayRow][i*3+1])/2,(STATE[ArrayRow][i*3+2])/2));
       strip.show();
     }
-    delay(300);
-  
-    for (i=0; i < ArraySize/3; i++) {
-      strip.setPixelColor(i, strip.Color(0,10,0));
-      strip.show();
-    }
-    delay(300);
   
   
   
   
-  
-  
+    /// Reading incoming serial data into an Array starts here
   
     BytesInBuffer =  Serial.available(); 
     if (Diagnostic) {
@@ -122,19 +130,31 @@
       {
         if (Diagnostic) {
           Serial.println("[ we're in business");
+          while (!Serial.available()) {}; 
+          ArrayRow = Serial.read();
         }
-        Serial.readBytesUntil(254, (char *)STATE, 10);
+        Serial.readBytesUntil(254, (char *)STATE[ArrayRow], nLEDs*3);
       }
     } 
     ///// print array to serial port for verification
   
-    for (int i=0; i<10 ; i++)
+    for (int i=0; i< nLEDs*3 ; i++)
     {
-      Serial.print(STATE[i], DEC);
+      Serial.print(0);
+      Serial.print(" ");
+      Serial.print(STATE[0][i], DEC);
+      Serial.print(" ");
+  
+      Serial.print(4);
+      Serial.print(" ");
+      Serial.print(STATE[4][i], DEC);
       Serial.print(" ");
     }    
     Serial.println(" done.");
   }
+  
+  
+  
   
   
   
