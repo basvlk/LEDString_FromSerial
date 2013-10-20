@@ -105,12 +105,6 @@ void loop()
    */
 
 
-  for (i=0; i < nLEDs; i++) {
-    strip.setPixelColor(i, strip.Color((STATE0[i*3])/2,(STATE0[i*3+1])/2,(STATE0[i*3+2])/2));
-    strip.show();
-  }
-
-
 
 
   /// Reading incoming serial data into an Array starts here
@@ -136,38 +130,68 @@ void loop()
     {
       if (Diagnostic) {
         Serial.println("[ we're in business");
-      while (!Serial.available()) {
-       }; 
+        while (!Serial.available()) {
+        }; 
         Mode = Serial.read();
         Serial.print("Mode=");
         Serial.println(Mode);
       }
-      Serial.readBytesUntil(254, (char *)STATE0, nLEDs*3);
+      switch (Mode) {
+      case 0:
+
+        Serial.readBytesUntil(254, (char *)STATE0, nLEDs*3);
+
+        break;
+      case 1:
+
+        Serial.readBytesUntil(254, (char *)STATE1, nLEDs*3);
+
+        break;
+
+      case 10:
+        for (i=0; i < nLEDs; i++) {
+          strip.setPixelColor(i, strip.Color((STATE0[i*3])/2,(STATE0[i*3+1])/2,(STATE0[i*3+2])/2));
+          strip.show();
+        }
+        break;
+
+      case 11:
+        for (i=0; i < nLEDs; i++) {
+          strip.setPixelColor(i, strip.Color((STATE1[i*3])/2,(STATE1[i*3+1])/2,(STATE1[i*3+2])/2));
+          strip.show();
+        }
+        break;
+      }
+
     }
-  } 
+  }
+
   ///// print array to serial port for verification
 
-
+  /*
   Serial.print("A");
-  for (int i=0; i< nLEDs*3 ; i++)
-  {
-
-    Serial.print(" ");
-    Serial.print(STATE0[i], DEC);
-    Serial.print(" ");
-  }    
-  Serial.println("");
-
-  Serial.print("B");
-  for (int i=0; i< nLEDs*3 ; i++)
-  {
-
-    Serial.print(" ");
-    Serial.print(STATE3[i], DEC);
-    Serial.print(" ");
-  }    
-  Serial.println("");
+   for (int i=0; i< nLEDs*3 ; i++)
+   {
+   
+   Serial.print(" ");
+   Serial.print(STATE0[i], DEC);
+   Serial.print(" ");
+   }    
+   Serial.println("");
+   
+   Serial.print("B");
+   for (int i=0; i< nLEDs*3 ; i++)
+   {
+   
+   Serial.print(" ");
+   Serial.print(STATE1[i], DEC);
+   Serial.print(" ");
+   }    
+   Serial.println("");
+   */
 }
+
+
 
 
 
