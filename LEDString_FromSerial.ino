@@ -22,6 +22,7 @@
 const  int nLEDs = 24; // Number of RGB LEDs in strand:
 int dataPin  = 2; //green wire
 int clockPin = 3; //yellow wire
+int i;
 
 LPD8806 strip = LPD8806(nLEDs, dataPin, clockPin);
 
@@ -60,20 +61,36 @@ void setup() {
   Serial.println("Hello.");
   // 4 blinks to show Arduino is starting
   digitalWrite(ArduinoLedPin, HIGH);
+  strip.setPixelColor(0, strip.Color(20,0,0));
+  strip.show();
   delay(200);
   digitalWrite(ArduinoLedPin, LOW);
+  strip.setPixelColor(1, strip.Color(0,20,0));
+  strip.show();
   delay(100);  
   digitalWrite(ArduinoLedPin, HIGH);
+  strip.setPixelColor(2, strip.Color(0,0,20));
+  strip.show();
   delay(200);
   digitalWrite(ArduinoLedPin, LOW);
+  strip.setPixelColor(3, strip.Color(0,20,20));
+  strip.show();
   delay(100);
   digitalWrite(ArduinoLedPin, HIGH);
+  strip.setPixelColor(0, strip.Color(0,0,0));
+  strip.show();
   delay(200);
   digitalWrite(ArduinoLedPin, LOW);
+  strip.setPixelColor(1, strip.Color(0,0,0));
+  strip.show();
   delay(100);
   digitalWrite(ArduinoLedPin, HIGH);
+  strip.setPixelColor(2, strip.Color(0,0,0));
+  strip.setPixelColor(3, strip.Color(0,0,0));
+  strip.show();
   delay(500);
   digitalWrite(ArduinoLedPin, LOW);  
+
   if (Diagnostic) {
     Serial.println("[ Diagnostic ON"); 
   } 
@@ -87,26 +104,6 @@ void setup() {
 
 void loop() 
 {
-  ///LED TEST
-  int i;
-  /*
-      for (i=0; i < nLEDs; i++) {
-   strip.setPixelColor(i, strip.Color((BLUE[i*3])/2,(BLUE[i*3+1])/2,(BLUE[i*3+2])/2));
-   // strip.setPixelColor(i, strip.Color(0,0,127));
-   strip.show();
-   }
-   delay(300);
-   
-   for (i=0; i < nLEDs; i++) {
-   strip.setPixelColor(i, strip.Color((RED[i*3])/2,(RED[i*3+1])/2,(RED[i*3+2])/2));
-   strip.show();
-   }
-   delay(300);
-   */
-
-
-
-
   /// Reading incoming serial data into an Array starts here
 
   BytesInBuffer =  Serial.available(); 
@@ -129,7 +126,6 @@ void loop()
     if (inByte == 255)
     {
       if (Diagnostic) {
-        Serial.println("[ we're in business");
         while (!Serial.available()) {
         }; 
         Mode = Serial.read();
@@ -140,12 +136,18 @@ void loop()
       case 0:
 
         Serial.readBytesUntil(254, (char *)STATE0, nLEDs*3);
-
+        for (i=0; i < nLEDs; i++) {
+          strip.setPixelColor(i, strip.Color((STATE0[i*3])/2,(STATE0[i*3+1])/2,(STATE0[i*3+2])/2));
+          strip.show();
+        }
         break;
       case 1:
 
         Serial.readBytesUntil(254, (char *)STATE1, nLEDs*3);
-
+        for (i=0; i < nLEDs; i++) {
+          strip.setPixelColor(i, strip.Color((STATE1[i*3])/2,(STATE1[i*3+1])/2,(STATE1[i*3+2])/2));
+          strip.show();
+        }
         break;
 
       case 10:
@@ -162,7 +164,6 @@ void loop()
         }
         break;
       }
-
     }
   }
 
@@ -190,6 +191,7 @@ void loop()
    Serial.println("");
    */
 }
+
 
 
 
